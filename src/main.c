@@ -1,6 +1,17 @@
-#include <stdio.h>
 
-int main(void)
+//Server side for now
+
+#include <netinet/in.h>
+#include <winsock2.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+
+int main(int argc, char const* argv[])
 {
-    printf("Hellow, World! \n");
+    int serverfd, new_socket;
+    ssize_t valread;
+    struct sockaddr_in address;
 }
