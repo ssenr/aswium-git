@@ -14,4 +14,36 @@ int main(int argc, char const* argv[])
     int serverfd, new_socket;
     ssize_t valread;
     struct sockaddr_in address;
+    int opt = 1;
+    socklen_t addrlength = sizeof(address);
+    char buffer[1024] = {0};
+    char* msg = "Message recieved";
+
+    //creating file descriptor
+    if ((serverfd = socket(AF_INET ,SOCK_STREAM, 0 )) < 0){     //ipv4/6, tcp, protocol 0
+        perror("socket failed");    //print error
+        exit(EXIT_FAILURE);
+    }  
+
+    //forcefully attaching socket to port8080 (standard port for web servers)
+    /*
+    manipulate options for socket referred byfile descriptor sockfd, helps in reuse of address and port(optional)
+    prevent error of address already in use
+    */
+    if (setsockopt(serverfd,SOL_ROCKET,SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){    
+        perror("setsockopt failed?");
+        exit(EXIT_FAILURE);
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.sin_addr = INADDR_ANY; //dont change
+    address.sin_port = htons(8080);
+
+    //attaching socket to port 8080
+    /*
+        binds socket to address and port number specified in addr
+        INADDR_ANY to specify IP address
+    */
+    if(bind(serverfd,(struct sockaddr* )&address,sizeof(address))<0){
+
+    }
 }
