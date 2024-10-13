@@ -1,6 +1,6 @@
 #ifdef server_h
 #define server_h
 
-// Function Definitions
-//
+void serve();
+
 #endif

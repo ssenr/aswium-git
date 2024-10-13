@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-int main(int argc, char const* argv[])
+void serve()
 {
     int serverfd, new_socket;
     ssize_t valread;
@@ -29,12 +29,12 @@ int main(int argc, char const* argv[])
     manipulate options for socket referred byfile descriptor sockfd, helps in reuse of address and port(optional)
     prevent error of address already in use
     */
-    if (setsockopt(serverfd,SOL_ROCKET,SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){    
+    if (setsockopt(serverfd,SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){    
         perror("setsockopt failed?");
         exit(EXIT_FAILURE);
     }
     address.sin_family = AF_INET;
-    address.sin_addr.sin_addr = INADDR_ANY; //dont change
+    address.sin_addr.s_addr = INADDR_ANY; //dont change
     address.sin_port = htons(8080);
 
     //attaching socket to port 8080
@@ -50,8 +50,8 @@ int main(int argc, char const* argv[])
         perror("listen function failed");
         exit(EXIT_FAILURE);
     }
-    if(new_socket = accept(serverfd,(struct sockaddr*)&address,&addrlength)){
-        perror("accept");
+    if((new_socket = accept(serverfd,(struct sockaddr*)&address,&addrlength))<0){
+        perror("accept error");
         exit(EXIT_FAILURE);
     }
     valread = read(new_socket,buffer,1024 -1); //1 is subtracted for the null terminator
@@ -60,7 +60,7 @@ int main(int argc, char const* argv[])
     printf("msg sent\n");
     close(new_socket);
     close(serverfd);
-    return 0;
+   
 
 }
 
