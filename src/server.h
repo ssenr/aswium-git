@@ -1,5 +1,5 @@
-#ifdef client_h
-#define client_h
+#ifdef server_h
+#define server_h
 
 // Function Definitions
 //
