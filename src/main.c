@@ -1,8 +1,4 @@
-
-//Server side for now
-
 #include <netinet/in.h>
-#include <winsock2.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,12 +26,12 @@ int main(int argc, char const* argv[])
     manipulate options for socket referred byfile descriptor sockfd, helps in reuse of address and port(optional)
     prevent error of address already in use
     */
-    if (setsockopt(serverfd,SOL_ROCKET,SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){    
+    if (setsockopt(serverfd,SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){    
         perror("setsockopt failed?");
         exit(EXIT_FAILURE);
     }
     address.sin_family = AF_INET;
-    address.sin_addr.sin_addr = INADDR_ANY; //dont change
+    address.sin_addr.s_addr = INADDR_ANY; //dont change
     address.sin_port = htons(8080);
 
     //attaching socket to port 8080
