@@ -1,104 +1,35 @@
-
-//Server side for now
-
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <netdb.h>
-#include <sys/types.h>
 
-//designed for chat between client and server
-void chat(int connfd){
-    char buff[MAX];
-    int n;
-    for(;;){    //infinite loop
-        bzero(buff,MAX);
-        read(connfd, buff, sizeof(buff));
-        printf("from client: %s\t to client: ",buff);
-        bzero(buff,MAX);
-        n = 0;
-        while((buff[n++] = getchar()) != '\n');
-        write(connfd,buff,sizeof(buff));
-
-        if(strncmp("exit",buff,4)==0){
-            printf("Server exit\n");
-            break;
-        }
-    }
-}
+#include "http.h"
 
 void serve()
 {
-    int serverfd, connfd,len;
-    struct sockaddr_in address, cli;
-    int opt = 1;
-    socklen_t addrlength = sizeof(address);
-    char buffer[1024] = {0};
-    char* msg = "Message recieved";
+  int server_socket;
+  server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
-    //creating file descriptor
-    serverfd = socket(AF_INET ,SOCK_STREAM,0);
-    if (serverfd==-1){     //ipv4/6, tcp, protocol 0
-        perror("socket creation failed");    //print error
-        exit(0);
-    } 
-    else{
-        printf("Socket created\n");
-        bzero(&address,sizeof(address));
-    }
+  struct sockaddr_in server_address;
+  server_address.sin_family = AF_INET;
+  server_address.sin_port = htons(8080);
+  server_address.sin_addr.s_addr = INADDR_ANY;
 
-    //forcefully attaching socket to port8080 (standard port for web servers)
-    /*
-    manipulate options for socket referred byfile descriptor sockfd, helps in reuse of address and port(optional)
-    prevent error of address already in use
-    */
-    if (setsockopt(serverfd,SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){    
-        perror("setsockopt failed?");
-        exit(EXIT_FAILURE);
-    }
+  bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address));
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = hton1(INADDR_ANY); //dont change
-    address.sin_port = htons(8080);
+  listen(server_socket, 5);
 
-    //attaching socket to port 8080
-    /*
-        binds socket to address and port number specified in addr
-        INADDR_ANY to specify IP address
-    */
-    if(bind(serverfd,(struct sockaddr* )&address,sizeof(address))!=0){
-        perror("bind failed\n");
-        exit(0);
-    }
-    else{
-        printf("socket binded\n");
-    }
+  int client_socket;
 
-    if(listen(serverfd,5)!=0){
-        perror("listen function failed\n");
-        exit(0);
-    }
-    else{
-        printf("server listening\n");
-        len = sizeof(cli);
-    }
+  char* response_header = http_header_ok();
 
-    if((new_socket = accept(serverfd,(struct sockaddr*)&address,&addrlength))<0){
-        perror("accept error\n");
-        exit(0);
-    }
-    else{
-        printf("server accepted\n");
-    }
-
-    chat(connfd);
-
-
-    close(serverfd);
-   
+  while(1)
+  {
+    client_socket = accept(server_socket, NULL, NULL);
+    send(client_socket, response_header, sizeof(response_header), 0);
+    close(client_socket);
+  }
 
 }
-
