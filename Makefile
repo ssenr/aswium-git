@@ -1,11 +1,24 @@
 all: aswium-git
 
-aswium-git: main.o client.o
-	gcc main.o client.o -o aswium-git
+aswium-git: main.o server.o lexer.o http.o
+	gcc main.o server.o lexer.o http.o -o aswium-git
 	chmod +x aswium-git
 
 main.o: ./src/main.c
 	gcc -c ./src/main.c 
 
-client.o: ./src/client.c 
-	gcc -c ./src/client.c
+server.o: ./src/server.c
+	gcc -c ./src/server.c
+
+lexer.o: ./src/lexer.c
+	gcc -c ./src/lexer.c
+
+http.o: ./src/http.c
+	gcc -c ./src/http.c
+
+clean:
+	@rm main.o
+	@rm server.o
+	@rm lexer.o
+	@rm http.o
+	all
