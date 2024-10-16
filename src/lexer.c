@@ -4,6 +4,6 @@
 #include <ctype.h>
 #include "lexer.h"
 
-static void skip_whitespace(const char *input, int *pos) {
-    while (isspace(input[*pos])) (*pos)++;
-}
+// static void skip_whitespace(const char *input, int *pos) {
+//     while (isspace(input[*pos])) (*pos)++;
+// }

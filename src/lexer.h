@@ -1,5 +1,4 @@
-#ifndef lexer_h
-#define lexer_h
+#pragma once
 
 typedef enum {
   TOKEN_HEADING,
@@ -23,4 +22,4 @@ typedef struct {
     char *value; //this is a pointer heh just learned this
 } Token;
 
-#endif
+//static void skip_whitespace(const char *input, int *pos);

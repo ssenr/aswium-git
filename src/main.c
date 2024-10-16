@@ -1,8 +1,10 @@
 #include <stdio.h>
+
 #include "server.h"
+#include "utils.h"
 
 int main(void)
 {
-   serve();
-   return 0;
+  run();
+  return 0;
 }

@@ -1,6 +1,3 @@
-#ifdef server_h
-#define server_h
+#pragma once
 
-void serve();
-
-#endif
+void run();

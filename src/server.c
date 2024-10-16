@@ -5,9 +5,10 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
+#include "server.h"
 #include "http.h"
 
-void serve()
+void run()
 {
   int server_socket;
   server_socket = socket(AF_INET, SOCK_STREAM, 0);
