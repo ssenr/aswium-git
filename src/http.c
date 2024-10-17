@@ -18,6 +18,7 @@ char* http_header_ok() // index.html
 
   char* str = (char*)malloc((len_header + len_html + 1)* sizeof(char));
   strcpy(str, http_header);
+  str[strlen(str)] = '\0'; 
   strcat(str, index_html);
 
   return str;

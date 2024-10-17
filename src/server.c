@@ -27,16 +27,11 @@ void run()
   int client_socket;
 
   char* response_header = http_header_ok();
-
-  printf("%s", response_header);
-
   while(1)
   {
     client_socket = accept(server_socket, NULL, NULL);
-    send(client_socket, response_header, sizeof(response_header), 0);
+    send(client_socket, response_header, (size_t) strlen(response_header), 0);
     close(client_socket);
   }
-
   free(response_header);
-
 }
