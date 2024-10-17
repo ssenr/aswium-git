@@ -11,7 +11,4 @@ void run();
 //static code analyzers, one that reads the code and analyze and hightlight it
 //read the name of the file and hight light it ina  certain way, percentages of different kinds of code
 //
-char *data = strstr( buffer, "\r\n\r\n")
-while (recv(sockfd, buffer, 1, 0)){
-    
-}
+#ifndef 
