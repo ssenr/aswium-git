@@ -33,3 +33,4 @@ char *request(struct client_tester *client, char *server_ip, void *request, unsi
     read(client->socket,response, 30000);
     return response;
 }
+
