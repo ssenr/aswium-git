@@ -12,7 +12,7 @@ void error(const char* message)
 char* read_html(const char* file_path) 
 {
   FILE *file_ptr;
-  static char html[MAX_HTML];
+  static char html[MAX_HTML_LENGTH];
   char buf;
 
   int iteration = 0;
@@ -26,7 +26,7 @@ char* read_html(const char* file_path)
 
   while((buf = fgetc(file_ptr)) != EOF)
   {
-    if (iteration > MAX_HTML)
+    if (iteration > MAX_HTML_LENGTH)
     {
       error("HTML file too large.");
       fclose(file_ptr);

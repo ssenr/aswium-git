@@ -6,14 +6,19 @@
 #include <sys/types.h>
 
 #include "utils.h"
+#include "http.h"
 
-char* http_header_ok()
+char* http_header_ok() // index.html
 {
   char* index_html = read_html("./src/html/index.html");
+  char* http_header = "HTTP/1.1 200 OK\r\n\n";
 
-  char http_header[2048] = "HTTP/1.1 200 OK\r\n\n";
-  strcat(http_header, index_html);
+  int len_header = strlen(http_header);
+  int len_html = strlen(index_html);
 
-  return index_html;
+  char* str = (char*)malloc((len_header + len_html + 1)* sizeof(char));
+  strcpy(str, http_header);
+  strcat(str, index_html);
+
+  return str;
 }
-

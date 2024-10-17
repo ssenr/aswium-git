@@ -1,12 +1,14 @@
-#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #include <sys/socket.h>
+#include <netinet/in.h>
 
 #include "server.h"
 #include "http.h"
+#include "utils.h"
 
 void run()
 {
@@ -26,11 +28,15 @@ void run()
 
   char* response_header = http_header_ok();
 
+  printf("%s", response_header);
+
   while(1)
   {
     client_socket = accept(server_socket, NULL, NULL);
     send(client_socket, response_header, sizeof(response_header), 0);
     close(client_socket);
   }
+
+  free(response_header);
 
 }
