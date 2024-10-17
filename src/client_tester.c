@@ -7,7 +7,7 @@
 
 char *request(struct client_tester *client, char *server_ip, void *request, unsigned long size);
 
-struct client_tester clientConstructor(int domain, int service, int protocol, int port, u_long interface){
+struct client_tester clientConstructor(int domain, int service, int protocol, int port, unsigned long interface){
     struct client_tester client;
     client.domain = domain;
     client.port = port;
@@ -34,3 +34,9 @@ char *request(struct client_tester *client, char *server_ip, void *request, unsi
     return response;
 }
 
+void test(){
+    client_tester tester;
+    char server_ip[] = "127.0.0.1";
+    clientConstructor(AF_INET, SOCK_STREAM, 0, 8080, )
+    request(&tester, &server_ip, )
+}

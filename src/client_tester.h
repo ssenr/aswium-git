@@ -11,11 +11,11 @@ struct client_tester{
     int protocol;
     int port;
 
-    u_long interface;
+    unsigned long interface;
     char* (*request)(struct Client *client, char *server_ip, void* request, unsigned long size);
 
 };
 
-struct client_tester clientConstructor(int domain, int service, int protocol, int port, u_long interface);
+struct client_tester clientConstructor(int domain, int service, int protocol, int port, unsigned long interface);
 
 #endif 
