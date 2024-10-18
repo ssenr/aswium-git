@@ -1,6 +1,7 @@
 # aswium-git
 
 # TODO
+- [x] Update server.c to handle concurrent requests with threads
 - [ ] Refactor read_html() function to use pointer instead of static (may cause issues in parallel execution)
 - [ ] Tester that prints header and packet info to console (perhaps .html raw file)
 - [ ] Design a system of tests (unit tests)
