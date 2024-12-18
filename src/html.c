@@ -12,8 +12,10 @@ void html()
 
 }
 
-char* read_html(const char* path){
+char** read_html(const char* path){
     FILE * fileptr = fopen("file.txt","r");
+    char** result;
+
     if (fileptr == NULL){
         printf("Error opening file// check permissions or path");
         return NULL;
@@ -60,8 +62,15 @@ char* read_html(const char* path){
             lines[total_lines] = realloc(lines[total_lines], updated);
         }
     }
-    while (true){
-        
-    }
+    while (true);
+
+    lines = realloc(lines,sizeof(char*) * total_lines);
+    result = lines;
+
+    for (size_t i =0; i< total_lines; i++)free(lines[i]);
+
+    fclose(fileptr);
+
     
+    return result;
 }
