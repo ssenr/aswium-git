@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 
 #define MAX_LINE 1024
@@ -12,9 +13,9 @@ void html()
 
 }
 
-char** read_html(const char* path){
-    FILE * fileptr = fopen("file.txt","r");
-    char** result;
+char* read_html(const char* path){
+    FILE * fileptr = fopen(path,"r");
+    char* result = "";
 
     if (fileptr == NULL){
         printf("Error opening file// check permissions or path");
@@ -65,7 +66,14 @@ char** read_html(const char* path){
     while (true);
 
     lines = realloc(lines,sizeof(char*) * total_lines);
-    result = lines;
+
+    strcpy(result, lines[0]);
+    for (size_t i =1; i< total_lines; i++){
+        printf("%s",lines[i]);
+        strcat(result, lines[i]);
+
+    }
+    free(result);
 
     for (size_t i =0; i< total_lines; i++)free(lines[i]);
 
