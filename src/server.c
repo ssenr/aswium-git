@@ -16,6 +16,37 @@
 
 char* index_html= "<!DOCTYPE html><html><head><link href=\"./src/html/index.css\" rel=\"stylesheet\" /><title>ASWIUM-GIT</title></head><body><h1> Herro!</h1><p>Mark your calendars, Oct 18th!</p><img src=\"./src/resources/spongebob.png\"></body></html>";
 
+char* get_file_ext(const char* fn)
+{
+    char* cpy = strdup(fn);
+    if (!cpy) return "";
+
+    char* ext = strrchr(cpy, '.');
+    if (ext == NULL)
+    {
+        free(cpy);
+        return "";
+    }
+    memmove(ext, ext+1, strlen(ext));
+    return ext;
+}
+
+char* get_file_name(const char* fn)
+{
+    char *cpy = strdup(fn);
+    if (!cpy)
+        return "";
+
+    char *ext = strrchr(cpy, '/');
+    if (ext == NULL)
+    {
+        free(cpy);
+        return "";
+    }
+    memmove(ext, ext + 1, strlen(ext));
+    return ext;
+}
+
 char* http_header_ok() // index.html
 {
   char* http_header = "HTTP/1.1 200 OK\r\n\n";
@@ -42,87 +73,93 @@ void* handle_client(void* fd)
     // printf("Recieved request:\n%s\n", buffer);
 
     // CSS
-    if (strncmp(buffer, "GET /src/html/index.css HTTP/1.1", 24) == 0)
-    {
-        FILE* file = fopen("./src/html/index.css", "rb");
-        fseek(file, 0, SEEK_END);
-        long file_size = ftell(file);
-        rewind(file);
+    // if (strncmp(buffer, "GET /src/html/index.css HTTP/1.1", 24) == 0)
+    // {
+    //     FILE* file = fopen("./src/html/index.css", "rb");
+    //     fseek(file, 0, SEEK_END);
+    //     long file_size = ftell(file);
+    //     rewind(file);
 
-        char* file_data = malloc(file_size);
-        fread(file_data, 1, file_size, file);
-        fclose(file);
+    //     char* file_data = malloc(file_size);
+    //     fread(file_data, 1, file_size, file);
+    //     fclose(file);
+
+    //     char* file_extension = get_file_ext(get_file_name("./src/html/index.css"));
+    //     char response_header[BUFFER_SIZE];
+    //     snprintf(response_header, BUFFER_SIZE,
+    //              "HTTP/1.1 200 OK\r\n"
+    //              "Content-Type: text/%s\r\n"
+    //              "Content-Length: %ld\r\n"
+    //              "Connection: close\r\n"
+    //              "\r\n",
+    //              file_extension,
+    //              file_size);
+
+    //     send(client_fd, response_header, strlen(response_header), 0);
+    //     send(client_fd, file_data, file_size, 0);
+    //     free(file_data);
+    // }
+
+    // // FAVICON LOL
+    // if (strncmp(buffer, "GET /favicon.ico HTTP/1.1", 24) == 0)
+    // {
+    //     FILE* file = fopen("./src/resources/favicon.ico", "rb");
+    //     fseek(file, 0, SEEK_END);
+    //     long file_size = ftell(file);
+    //     rewind(file);
+
+    //     char* file_data = malloc(file_size);
+    //     fread(file_data, 1, file_size, file);
+    //     fclose(file);
 
 
-        char response_header[BUFFER_SIZE];
-        snprintf(response_header, BUFFER_SIZE,
-                 "HTTP/1.1 200 OK\r\n"
-                 "Content-Type: text/css\r\n"
-                 "Content-Length: %ld\r\n"
-                 "Connection: close\r\n"
-                 "\r\n",
-                 file_size);
+    //     char response_header[BUFFER_SIZE];
+    //     snprintf(response_header, BUFFER_SIZE,
+    //              "HTTP/1.1 200 OK\r\n"
+    //              "Content-Type: image/x-icon\r\n"
+    //              "Content-Length: %ld\r\n"
+    //              "Connection: close\r\n"
+    //              "\r\n",
+    //              file_size);
 
-        send(client_fd, response_header, strlen(response_header), 0);
-        send(client_fd, file_data, file_size, 0);
-        free(file_data);
+    //     send(client_fd, response_header, strlen(response_header), 0);
+    //     send(client_fd, file_data, file_size, 0);
+    //     free(file_data);
+    // }
 
-    }
+    // // Spongebob
+    // if (strncmp(buffer, "GET /src/resources/spongebob.png HTTP/1.1", 24) == 0)
+    // {
+    //     FILE* file = fopen("./src/resources/spongebob.png", "rb");
+    //     fseek(file, 0, SEEK_END);
+    //     long file_size = ftell(file);
+    //     rewind(file);
 
-    // FAVICON LOL
-    if (strncmp(buffer, "GET /favicon.ico HTTP/1.1", 24) == 0)
-    {
-        FILE* file = fopen("./src/resources/favicon.ico", "rb");
-        fseek(file, 0, SEEK_END);
-        long file_size = ftell(file);
-        rewind(file);
+    //     char* file_data = malloc(file_size);
+    //     fread(file_data, 1, file_size, file);
+    //     fclose(file);
 
-        char* file_data = malloc(file_size);
-        fread(file_data, 1, file_size, file);
-        fclose(file);
+    //     char response_header[BUFFER_SIZE];
 
+    //     snprintf(response_header, BUFFER_SIZE,
+    //              "HTTP/1.1 200 OK\r\n"
+    //              "Content-Type: image/png\r\n"
+    //              "Content-Length: %ld\r\n"
+    //              "Connection: close\r\n"
+    //              "\r\n",
+    //              file_size);
 
-        char response_header[BUFFER_SIZE];
-        snprintf(response_header, BUFFER_SIZE,
-                 "HTTP/1.1 200 OK\r\n"
-                 "Content-Type: image/x-icon\r\n"
-                 "Content-Length: %ld\r\n"
-                 "Connection: close\r\n"
-                 "\r\n",
-                 file_size);
+    //     send(client_fd, response_header, strlen(response_header), 0);
+    //     send(client_fd, file_data, file_size, 0);
+    //     free(file_data);
+    // }
 
-        send(client_fd, response_header, strlen(response_header), 0);
-        send(client_fd, file_data, file_size, 0);
-        free(file_data);
-    }
-
-    // Spongebob
-    if (strncmp(buffer, "GET /src/resources/spongebob.png HTTP/1.1", 24) == 0)
-    {
-        FILE* file = fopen("./src/resources/spongebob.png", "rb");
-        fseek(file, 0, SEEK_END);
-        long file_size = ftell(file);
-        rewind(file);
-
-        char* file_data = malloc(file_size);
-        fread(file_data, 1, file_size, file);
-        fclose(file);
-
-        char response_header[BUFFER_SIZE];
-
-        snprintf(response_header, BUFFER_SIZE,
-                 "HTTP/1.1 200 OK\r\n"
-                 "Content-Type: image/png\r\n"
-                 "Content-Length: %ld\r\n"
-                 "Connection: close\r\n"
-                 "\r\n",
-                 file_size);
-
-        send(client_fd, response_header, strlen(response_header), 0);
-        send(client_fd, file_data, file_size, 0);
-        free(file_data);
-    }
-
+    /**
+     *  Extract URL from GET Request (Basic Routing)
+     *  Find if PATH exists in Directory 
+     *  If it does, return it
+     *  else, return 404
+     */
     if (bytes_recieved > 0)
     {
         regex_t regex;
@@ -132,6 +169,10 @@ void* handle_client(void* fd)
         
         if (regexec(&regex, buffer, 2, matches, 0) == 0)
         {
+            printf("Extracted REGEX:\n%s", buffer + buffer[matches[1].rm_eo]);
+            printf("Extracted REGEX:\n%s", buffer + buffer[matches[1].rm_so]);
+            printf("Another Extracted REGEX: \n%s", buffer + buffer[matches[2].rm_eo]);
+            printf("Another Extracted REGEX: \n%s", buffer + buffer[matches[2].rm_so]);
             char* header = http_header_ok();
             int len = strlen(header);
             send(client_fd, header, len, 0);
@@ -157,7 +198,7 @@ void run_server()
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(8080);
+    server_addr.sin_port = htons(8081);
 
     int bind_status = bind(server_fd, (struct sockaddr *) &server_addr, sizeof(server_addr));
 
@@ -167,8 +208,8 @@ void run_server()
         exit(EXIT_FAILURE);
     }
 
-    // MAX CONNECTIONS = 10
-    int listen_status = listen(server_fd, 10);
+    // MAX CONNECTIONS = 15
+    int listen_status = listen(server_fd, 15);
 
     if (listen_status < 0)
     {
