@@ -9,12 +9,40 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define BUFFER_SIZE     2048
+#define BUFFER_SIZE     104857600
+
+// Strangely similar to code from Jeffery Yu, found at:
+// https://dev.to/jeffreythecoder/how-i-built-a-simple-http-server-from-scratch-using-c-739
+
+char* test_html = "HTTP/1.1 200 OK \r\n Content-Type: text/plain\r\n \r\n text/html<!DOCTYPE html><html><head><title>ASWIUM-GIT</title></head><body><h1> Herro!</h1><p>Mark your calendars, Oct 18th!</p></body></html>";
 
 void* handle_client(void* fd)
 {
     int client_fd = *((int*) fd);
+    
+    // 1 Megabyte Buffer
     char* buffer = (char*)malloc(BUFFER_SIZE);
+
+    ssize_t bytes_recieved = recv(client_fd, buffer, BUFFER_SIZE, 0);
+    if (bytes_recieved > 0)
+    {
+        regex_t regex;
+        regcomp(&regex, "^GET /([^ ]*) HTTP/1", REG_EXTENDED);
+
+        regmatch_t matches[2];
+        
+        if (regexec(&regex, buffer, 2, matches, 0) == 0)
+        {
+            int len = strlen(test_html);
+            send(client_fd, test_html, len, 0);
+            free(test_html);
+        }
+        regfree(&regex);
+    }
+    close(client_fd);
+    free(fd);
+    free(buffer);
+    return NULL;
 }
 
 void run_server()
@@ -56,16 +84,11 @@ void run_server()
         int* client_fd = malloc(sizeof(int));
 
         *client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_addr_len);
-        if (client_fd < 0)
-        {
-            perror("Accept Failed");
-            continue;
-        }
 
         // Create new thread for every connection
         // Handle connection by calling handle_client function and passing client file descriptor
         pthread_t thread_id;
-        pthead_creat(&thread_id, NULL, handle_client, (void*) client_fd);
+        pthread_create(&thread_id, NULL, handle_client, (void*) client_fd);
         pthread_detach(thread_id);
     }
 }
