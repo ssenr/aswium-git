@@ -14,7 +14,7 @@
 // Strangely similar to code from Jeffery Yu, found at:
 // https://dev.to/jeffreythecoder/how-i-built-a-simple-http-server-from-scratch-using-c-739
 
-char* index_html= "<!DOCTYPE html><html><head><title>ASWIUM-GIT</title></head><body><h1> Herro!</h1><p>Mark your calendars, Oct 18th!</p><img src=\"./src/resources/spongebob.png\"></body></html>";
+char* index_html= "<!DOCTYPE html><html><head><link href=\"./src/html/index.css\" rel=\"stylesheet\" /><title>ASWIUM-GIT</title></head><body><h1> Herro!</h1><p>Mark your calendars, Oct 18th!</p><img src=\"./src/resources/spongebob.png\"></body></html>";
 
 char* http_header_ok() // index.html
 {
@@ -39,7 +39,35 @@ void* handle_client(void* fd)
     char* buffer = (char*)malloc(BUFFER_SIZE);
 
     ssize_t bytes_recieved = recv(client_fd, buffer, BUFFER_SIZE, 0);
-    printf("Recieved request:\n%s\n", buffer);
+    // printf("Recieved request:\n%s\n", buffer);
+
+    // CSS
+    if (strncmp(buffer, "GET /src/html/index.css HTTP/1.1", 24) == 0)
+    {
+        FILE* file = fopen("./src/html/index.css", "rb");
+        fseek(file, 0, SEEK_END);
+        long file_size = ftell(file);
+        rewind(file);
+
+        char* file_data = malloc(file_size);
+        fread(file_data, 1, file_size, file);
+        fclose(file);
+
+
+        char response_header[BUFFER_SIZE];
+        snprintf(response_header, BUFFER_SIZE,
+                 "HTTP/1.1 200 OK\r\n"
+                 "Content-Type: text/css\r\n"
+                 "Content-Length: %ld\r\n"
+                 "Connection: close\r\n"
+                 "\r\n",
+                 file_size);
+
+        send(client_fd, response_header, strlen(response_header), 0);
+        send(client_fd, file_data, file_size, 0);
+        free(file_data);
+
+    }
 
     // FAVICON LOL
     if (strncmp(buffer, "GET /favicon.ico HTTP/1.1", 24) == 0)
