@@ -14,7 +14,22 @@
 // Strangely similar to code from Jeffery Yu, found at:
 // https://dev.to/jeffreythecoder/how-i-built-a-simple-http-server-from-scratch-using-c-739
 
-char* test_html = "HTTP/1.1 200 OK \r\n Content-Type: text/plain\r\n \r\n text/html<!DOCTYPE html><html><head><title>ASWIUM-GIT</title></head><body><h1> Herro!</h1><p>Mark your calendars, Oct 18th!</p></body></html>";
+char* index_html= "<!DOCTYPE html><html><head><title>ASWIUM-GIT</title></head><body><h1> Herro!</h1><p>Mark your calendars, Oct 18th!</p></body></html>";
+
+char* http_header_ok() // index.html
+{
+  char* http_header = "HTTP/1.1 200 OK\r\n\n";
+
+  int len_header = strlen(http_header);
+  int len_html = strlen(index_html);
+
+  char* str = (char*)malloc((len_header + len_html + 1)* sizeof(char));
+  strcpy(str, http_header);
+  str[strlen(str)] = '\0';
+  strcat(str, index_html);
+
+  return str;
+}
 
 void* handle_client(void* fd)
 {
@@ -33,9 +48,10 @@ void* handle_client(void* fd)
         
         if (regexec(&regex, buffer, 2, matches, 0) == 0)
         {
-            int len = strlen(test_html);
-            send(client_fd, test_html, len, 0);
-            free(test_html);
+            char* header = http_header_ok();
+            int len = strlen(header);
+            send(client_fd, header, len, 0);
+            free(header);
         }
         regfree(&regex);
     }
@@ -51,7 +67,7 @@ void run_server()
     struct sockaddr_in server_addr;
     if ( server_fd < 0)
     {
-        perror("Socket initilization failed.");
+        perror("Socket initilization failed");
         exit(EXIT_FAILURE);
     }
 
@@ -63,7 +79,7 @@ void run_server()
 
     if (bind_status < 0)
     {
-        perror("Binding socket to port failed.");
+        perror("Binding socket to port failed");
         exit(EXIT_FAILURE);
     }
 
@@ -72,7 +88,7 @@ void run_server()
 
     if (listen_status < 0)
     {
-        perror("Listening to socket failed.");
+        perror("Listening to socket failed");
         exit(EXIT_FAILURE);
     }
 
