@@ -65,13 +65,17 @@ char* get_mime_type(const char* file_ext)
     {
         return "image/jpeg";
     }
-    else if (strcmp(file_ext, ".ico") == 0)
+    else if (strcmp(file_ext, "ico") == 0)
     {
         return "image/x-icon";
     }
-    else if (strcmp(file_ext, ".css") == 0)
+    else if (strcmp(file_ext, "css") == 0)
     {
         return "text/css";
+    }
+    else if (strcmp(file_ext, "png") == 0)
+    {
+        return "image/png";
     }
     return "";
 }
@@ -139,13 +143,15 @@ char* get_file_data(char* path)
 {
     // READ FILE
     FILE* file = fopen(path, "rb");
-    fseek(file, -1, SEEK_END);
+    fseek(file, 0, SEEK_END);
     long file_size = ftell(file);
     rewind(file);
 
-    char* file_data = malloc(file_size);
-    fread(file_data, 0, file_size, file);
+    char* file_data = malloc(file_size+1);
+    size_t len = fread(file_data, 1, file_size, file);
     fclose(file);
+
+    file_data[len] = '\0';
 
     return file_data;
 }
@@ -195,6 +201,7 @@ void* handle_client(void* fd)
      *  If it does, return it
      *  else, return 404
      */
+    printf("Request Recieved:\n%s",buffer);
 
     if (bytes_recieved > 0)
     {
@@ -206,7 +213,12 @@ void* handle_client(void* fd)
         if (regexec(&regex, buffer, 2, matches, 0) == 0)
         {
             // Get file path of requested resources 
-            char* file_path = get_requested_resource_path(buffer);
+            // CAUSES SEGFAULT:
+            // caused because lack of entrypoint:
+            // if request is / append root (./src/html)
+            // 
+            char* first_line = extract_first_line(buffer);
+            char* file_path = get_requested_resource_path(first_line);
             char* file_ext = get_file_ext(file_path);
             char* mime_type = get_mime_type(file_ext);
 
