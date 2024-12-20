@@ -15,6 +15,41 @@
 // Strangely similar to code from Jeffery Yu, found at:
 // https://dev.to/jeffreythecoder/how-i-built-a-simple-http-server-from-scratch-using-c-739
 
+// Request Recieved:
+// GET / HTTP/1.1
+// Host: localhost:8080
+// Connection: keep-alive
+// Cache-Control: max-age=0
+// sec-ch-ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+// sec-ch-ua-mobile: ?0
+// sec-ch-ua-platform: "Windows"
+// Upgrade-Insecure-Requests: 1
+// User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+// Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,/;q=0.8
+// Sec-GPC: 1
+// Accept-Language: en-US,en
+// Sec-Fetch-Site: none
+// Sec-Fetch-Mode: navigate
+// Sec-Fetch-User: ?1
+// Sec-Fetch-Dest: document
+// Accept-Encoding: gzip, deflate, br, zstd
+
+// GET /src/resources/spongebob.png HTTP/1.1
+// Host: localhost:8080
+// Connection: keep-alive
+// sec-ch-ua-platform: "Windows"
+// User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+// sec-ch-ua: "Brave";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+// sec-ch-ua-mobile: ?0
+// Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+// Sec-GPC: 1
+// Accept-Language: en-US,en
+// Sec-Fetch-Site: same-origin
+// Sec-Fetch-Mode: no-cors
+// Sec-Fetch-Dest: image
+// Referer: http://localhost:8080/
+// Accept-Encoding: gzip, deflate, br, zstd
+
 char* index_html= "<!DOCTYPE html><html><head><link href=\"./src/html/index.css\" rel=\"stylesheet\" /><title>ASWIUM-GIT</title></head><body><h1> Herro!</h1><p>Mark your calendars, Oct 18th!</p><img src=\"./src/resources/spongebob.png\"></body></html>";
 
 char* get_file_ext(const char* fn)
@@ -112,17 +147,19 @@ char* get_requested_resource_path(const char* get_request)
     buf[len] = '\0';
 
     regfree(&regex);
-
-    size_t new_len = strlen(buf);
-    char* new_buf =(char*)malloc(new_len);
-
-    new_buf[0] = '.';
-    new_buf[1] = '\0';
-
-    strncat(new_buf, buf, new_len);
-
-    return new_buf;
+    return buf;
 }
+
+char* append_period(const char* fp)
+{
+    size_t len = strlen(fp);
+    char* buf = (char*)malloc(len);
+    buf[0] = '.';
+    buf[1] = '\0';
+
+    strncat(buf, fp, len);
+    return buf;
+} 
 
 char* http_header_ok() // index.html
 {
@@ -186,6 +223,16 @@ char* build_header(const char* mime_type, long file_size)
     return header;
 }
 
+int is_resource(char* file_ext)
+{
+    if (strcmp(file_ext, "") == 0)
+    {
+        return 0;
+    }
+    // Return 1 if request header is requesting a resoruce (.css, .png, .jpeg etc.) 
+    return 1;
+}
+
 void* handle_client(void* fd)
 {
     int client_fd = *((int*) fd);
@@ -216,27 +263,6 @@ void* handle_client(void* fd)
             // CAUSES SEGFAULT:
             // caused because lack of entrypoint:
             // if request is / append root (./src/html)
-            // 
-            char* first_line = extract_first_line(buffer);
-            char* file_path = get_requested_resource_path(first_line);
-            char* file_ext = get_file_ext(file_path);
-            char* mime_type = get_mime_type(file_ext);
-
-            char* file_data = get_file_data(file_path);
-            long file_size = get_file_size(file_path);
-
-            char* header1 = build_header(mime_type, file_size);
-
-            // char* header = http_header_ok();
-            int len = strlen(header1);
-            send(client_fd, header1, len, 0);
-            send(client_fd, file_data, file_size, -1);
-
-            free(header1);
-            free(file_path);
-            free(file_ext);
-            free(mime_type);
-            free(file_data);
         }
         regfree(&regex);
     }
