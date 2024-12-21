@@ -4,11 +4,47 @@
 
 void html()
 {
+// read only html so seperate everything else
+    char* path = "alksdhlkajsfdh.html";
+    char* file_name = getfile_name(path); //change later maybe
+    if (get_file_ext(file_name) == "html"){
+        char* html_content = read_html(path);
+    }
+}
 
+char* get_file_ext(const char* fn)
+{
+    char* cpy = strdup(fn);
+    if (!cpy) return "";
+
+    char* ext = strrchr(cpy, '.');
+    if (ext == NULL)
+    {
+        free(cpy);
+        return "";
+    }
+    memmove(ext, ext+1, strlen(ext));
+    return ext;
+}
+
+char* get_file_name(const char* fn)
+{
+    char *cpy = strdup(fn);
+    if (!cpy)
+        return "";
+
+    char *ext = strrchr(cpy, '/');
+    if (ext == NULL)
+    {
+        free(cpy);
+        return "";
+    }
+    memmove(ext, ext + 1, strlen(ext));
+    return ext;
 }
 
 char* read_html(const char* path){
-    FILE *file = fopen(path, "r");
+    FILE *file = fopen(path, "rb");
 
     if (file == NULL){
         printf("Error opening file\n");
@@ -30,7 +66,7 @@ char* read_html(const char* path){
             i* = '';
         }
         else if(i* == '"')
-            i* = '\"';
+            i* = append('\"', i*);
     }
 
     file_data = i;
@@ -38,3 +74,15 @@ char* read_html(const char* path){
     file_data[len] = '\0';
     return file_data;
 }
+
+//theoretically will work
+char* append(const char* value, const char* origin){
+    size_t new = strlen(origin);
+    char* appended = (char*)malloc(new+1);
+    appended[0] = '\"';
+    appended[1] = origin;
+    
+    return appended;
+
+}
+
