@@ -58,7 +58,8 @@ char* read_html(const char* path){
         token = strtok(NULL, delim);
     }//so delimiter then append for final
 
-
+    free(file_data);
+    free(token);
 
     final[len] = '\0';
     return final;
